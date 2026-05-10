@@ -61,15 +61,51 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 @keyframes loFill{0%{width:0%}60%{width:80%}100%{width:100%}}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-9px) rotate(4deg)}}
 
-/* Login — must scroll on small phones */
-#login{background:#30312c;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.login-wrap{width:100%;max-width:400px;padding:24px;padding-top:max(env(safe-area-inset-top,0px),24px);padding-bottom:40px;margin:auto}
-.nchip{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.11);border-radius:1rem;padding:14px 8px;color:rgba(255,255,255,.8);font-size:14px;font-weight:600;text-align:center;transition:all .18s;position:relative;overflow:hidden}
-.nchip::after{content:'';position:absolute;inset:0;background:var(--c,#f59e0b);opacity:0;transition:opacity .18s;border-radius:14px}
-.nchip span{position:relative;z-index:1}
-.nchip.sel::after{opacity:1}
-.nchip.sel span{color:#2a1700;font-weight:800}
-.nchip.sel{border-color:transparent}
+/* Login — PIN keypad */
+#login{background:#221f1a;padding:0;overflow:hidden}
+#login.active{display:flex}
+#loginBg{
+  height:100%;
+  background:
+    radial-gradient(800px 400px at 20% 0%, rgba(245,158,11,0.25), transparent 60%),
+    radial-gradient(600px 400px at 100% 100%, rgba(133,83,0,0.5), transparent 65%),
+    #221f1a;
+  color:#fff;display:flex;flex-direction:column;
+  padding:max(env(safe-area-inset-top,0px),60px) 28px max(env(safe-area-inset-bottom,0px),32px)
+}
+.lb-greet-wrap{flex-shrink:0}
+.lb-mark{
+  width:64px;height:64px;border-radius:22px;
+  background:linear-gradient(135deg,#f59e0b,#d97706);
+  display:flex;align-items:center;justify-content:center;font-size:32px;
+  box-shadow:0 12px 32px rgba(245,158,11,.3),inset 0 1px 0 rgba(255,255,255,.3);
+  margin-bottom:22px
+}
+.lb-greet{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;line-height:1.05;letter-spacing:-0.02em}
+.lb-greet .amber{color:#f59e0b}
+.lb-greet-sub{color:rgba(255,255,255,.5);font-size:14px;margin-top:8px;font-weight:500}
+.pin-dots{display:flex;gap:14px;justify-content:center;margin:36px 0 16px}
+.pin-dot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:transparent;transition:all .15s}
+.pin-dot.filled{background:#f59e0b;border-color:#f59e0b;box-shadow:0 0 16px rgba(245,158,11,.5)}
+.pin-dots.shake{animation:shake .4s}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-8px)}40%,60%{transform:translateX(8px)}}
+.pin-err{text-align:center;color:#ff8a8a;font-size:12px;font-weight:600;min-height:16px;margin-bottom:8px}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:auto;max-width:340px;margin-left:auto;margin-right:auto;width:100%}
+.key{
+  aspect-ratio:1.45;border-radius:22px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:26px;
+  backdrop-filter:blur(20px);transition:all .12s;cursor:pointer;
+  -webkit-tap-highlight-color:transparent
+}
+.key:active{background:rgba(245,158,11,.25);transform:scale(.95)}
+.key .sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:1px;margin-top:1px}
+.key.key-blank{background:transparent;border:none;pointer-events:none}
+.key.key-action{background:rgba(255,255,255,.04);font-size:0;color:rgba(255,255,255,.7)}
+.lb-meta{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:8px;flex-shrink:0}
+.lb-meta-l{color:rgba(255,255,255,.3);font-size:11px;font-weight:500;background:none;border:none;cursor:default}
+.lb-meta-link{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 
 /* App shell */
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:90px}
@@ -136,9 +172,11 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
   align-items:flex-end;
   gap:8px;
 }
-.chat-header{background:#30312c;padding:12px 16px 10px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06)}
-.chat-header-title{font-family:'Syne';font-weight:800;font-size:15px;color:#fff}
-.chat-header-sub{font-size:11px;color:rgba(255,255,255,.35);margin-top:1px}
+.chat-header{background:#fff;padding:14px 16px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0;border-bottom:1px solid #f0eee6;box-shadow:0 1px 0 rgba(133,83,0,.03)}
+.chat-header-icon{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 12px rgba(245,158,11,.25)}
+.chat-header-title{font-family:'Syne';font-weight:800;font-size:16px;color:#1b1c17;letter-spacing:-.01em}
+.chat-header-sub{font-size:11px;color:#867461;margin-top:1px;font-weight:500}
+.chat-header-sub .online-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#46673d;margin-right:4px;vertical-align:middle}
 .chat-date-divider{text-align:center;margin:12px 0 8px;position:relative}
 .chat-date-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#e4e3db}
 .chat-date-pill{position:relative;display:inline-block;background:#fbf9f1;border:1px solid #e4e3db;border-radius:9999px;padding:3px 12px;font-size:11px;font-weight:600;color:#867461}
@@ -272,6 +310,93 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 /* Task badge on nav tab */
 .ntab-badge{position:absolute;top:4px;right:50%;margin-right:-18px;background:#ba1a1a;color:#fff;font-size:9px;font-weight:800;min-width:14px;height:14px;border-radius:7px;display:none;align-items:center;justify-content:center;padding:0 4px;border:1.5px solid #30312c}
 .ntab-badge.show{display:flex}
+
+/* ─── Hi-Fi Schedule Day Cards ──────────────────── */
+.day-card{background:#fff;border-radius:18px;padding:14px;margin-bottom:8px;box-shadow:0 2px 12px rgba(133,83,0,.04);border:1px solid #f0eee6;transition:transform .15s}
+.day-card.today{background:linear-gradient(135deg,#fff7e6,#ffeccb);border-color:#f59e0b}
+.day-card.mine{border-left:3px solid #f59e0b}
+.day-card.past{opacity:.55}
+.day-card .dh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:8px}
+.day-card .dn{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.day-card .dnum{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;line-height:1;color:#1b1c17}
+.day-card .ddow{font-size:10px;font-weight:700;letter-spacing:1px;color:#867461;text-transform:uppercase}
+.day-card .ddow.weekend{color:#ba1a1a}
+.day-card.today .dnum,.day-card.today .ddow{color:#653e00}
+.badge-today{background:#653e00;color:#f59e0b;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 7px;border-radius:6px}
+.badge-mine{background:#f59e0b;color:#653e00;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 7px;border-radius:6px;white-space:nowrap}
+.chips{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.ch-taken{display:inline-flex;align-items:center;gap:5px;background:#30312c;color:#fff;padding:5px 10px 5px 5px;border-radius:999px;font-size:12px;font-weight:600;line-height:1;box-shadow:0 2px 6px rgba(0,0,0,.08);position:relative}
+.ch-taken.mine{box-shadow:0 0 0 2px #f59e0b,0 2px 6px rgba(245,158,11,.25)}
+.ch-av{width:20px;height:20px;border-radius:50%;background:#f59e0b;color:#653e00;font-family:'Syne',sans-serif;font-weight:800;font-size:10px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ch-claim{display:inline-flex;align-items:center;gap:5px;background:#ffddb8;color:#653e00;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;line-height:1;cursor:pointer;border:1.5px dashed #f59e0b;transition:all .15s}
+.ch-claim:active{transform:scale(.96);background:#f59e0b;color:#fff}
+.ch-admin-add{display:inline-flex;align-items:center;gap:4px;background:#f5f4ec;color:#867461;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:600;line-height:1;cursor:pointer;border:1.5px dashed #d8c3ad}
+.ch-admin-add:active{transform:scale(.96)}
+.ch-mini{display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.18);border:none;color:rgba(255,255,255,.7);width:18px;height:18px;border-radius:50%;font-size:10px;cursor:pointer;margin-left:2px}
+.ch-mini:hover{background:rgba(255,255,255,.3)}
+.ch-mini.x{background:rgba(186,26,26,.3)}
+.ch-ft{display:inline-flex;align-items:center;font-size:9px;background:rgba(255,255,255,.25);padding:1px 5px;border-radius:4px;margin-left:2px;font-weight:700}
+.ch-empty{color:#867461;font-size:11px;font-style:italic}
+.ch-avail-off{display:inline-flex;align-items:center;gap:3px;color:#ba1a1a;font-size:10px;font-style:italic;background:#ffdad6;padding:3px 8px;border-radius:6px}
+.day-note{display:block;margin-top:8px;font-size:11px;color:#653e00;background:#ffddb8;border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;padding:5px 9px;line-height:1.4}
+.swap-pill{font-size:9px;background:#ffdad6;color:#93000a;padding:2px 6px;border-radius:4px;margin-left:3px;font-weight:700}
+
+/* Week separator */
+.week-sep{display:flex;align-items:center;gap:10px;margin:14px 2px 8px;color:#867461}
+.week-sep .line{flex:1;height:1px;background:#d8c3ad;opacity:.5}
+.week-sep .lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+
+/* ─── Hi-Fi Admin Home ──────────────────── */
+.adm-home-view{padding:18px 16px 100px}
+.adm-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.adm-title{font-family:'Syne',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;color:#1b1c17;line-height:1}
+.adm-sub{font-size:13px;color:#534434;margin-top:4px;font-weight:500}
+.adm-icon-btn{position:relative;background:#f5f4ec;border:1px solid #d8c3ad;border-radius:11px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer}
+.adm-icon-btn .badge{position:absolute;top:-3px;right:-3px;background:#ba1a1a;color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:8px;display:none;align-items:center;justify-content:center;padding:0 4px;border:1.5px solid #fbf9f1}
+.adm-icon-btn .badge:not(:empty){display:flex}
+
+.alerts-card{background:#fff;border:1px solid #f0eee6;border-radius:18px;padding:14px;margin-bottom:18px;box-shadow:0 2px 12px rgba(133,83,0,.04)}
+.alerts-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.alerts-head .lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#534434}
+.alerts-head .count{background:#534434;color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;padding:2px 9px;border-radius:999px;line-height:1.4}
+.alerts-head .count.zero{background:#c4eab6;color:#2e4e28}
+.alert-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #f0eee6;cursor:pointer;transition:opacity .12s}
+.alert-row:first-child{border-top:none;padding-top:4px}
+.alert-row:active{opacity:.6}
+.alert-row .ico{width:34px;height:34px;border-radius:10px;background:#f5f4ec;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.alert-row.urgent .ico{background:#ffddb8}
+.alert-row .txt{flex:1;font-size:13px;color:#1b1c17;font-weight:500}
+.alert-row .arr{color:#867461;font-size:18px}
+.alerts-empty{text-align:center;padding:18px 0;color:#46673d;font-size:13px;font-weight:600}
+.alerts-empty .e{font-size:28px;display:block;margin-bottom:4px}
+
+.tools-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#534434;margin-bottom:10px}
+.tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tool{position:relative;background:#fff;border:1px solid #f0eee6;border-radius:16px;padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .12s;box-shadow:0 2px 8px rgba(133,83,0,.03);font-family:inherit}
+.tool:active{transform:scale(.96);box-shadow:0 1px 4px rgba(133,83,0,.06)}
+.tool .ic{font-size:24px;line-height:1}
+.tool .l{font-size:11px;font-weight:600;color:#1b1c17;text-align:center;line-height:1.2}
+.tool.tool-amber{background:#ffddb8;border-color:#ffb95f}
+.tool.tool-amber .l{color:#653e00}
+.tool.tool-good{background:#c4eab6;border-color:#abd19e}
+.tool.tool-good .l{color:#2e4e28}
+.tool .t-badge{position:absolute;top:-5px;right:-5px;background:#ba1a1a;color:#fff;font-size:9px;font-weight:800;min-width:18px;height:18px;border-radius:9px;display:none;align-items:center;justify-content:center;padding:0 5px;border:2px solid #fbf9f1}
+.tool .t-badge:not(:empty){display:flex}
+
+/* Drill-in view */
+.adm-drill-view{padding-bottom:100px}
+.adm-drill-head{position:sticky;top:0;z-index:30;background:#fbf9f1;display:flex;align-items:center;gap:8px;padding:14px 12px 10px;border-bottom:1px solid #f0eee6}
+.adm-back{background:#f5f4ec;border:1px solid #d8c3ad;border-radius:11px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;color:#534434;font-weight:700;line-height:1;padding-bottom:3px}
+.adm-back:active{background:#eae8e0}
+.adm-drill-title{flex:1;text-align:center;font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:#1b1c17}
+
+/* My Shifts polish */
+.payout-pill{background:rgba(255,255,255,.18);backdrop-filter:blur(8px);border-radius:14px;padding:7px 10px 7px 12px;display:flex;flex-direction:column;gap:1px;line-height:1.1}
+.payout-pill .lbl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:.75}
+.payout-pill .amt{font-family:'Syne',sans-serif;font-weight:800;font-size:14px}
+.shift-paid-pill{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:#c4eab6;color:#2e4e28;white-space:nowrap}
+.shift-unpaid-pill{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:#ffddb8;color:#653e00;white-space:nowrap}
+.shift-time-ico{font-size:12px;opacity:.65;margin-right:3px}
 </style>
 </head>
 <body>
@@ -340,30 +465,35 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 
 <!-- LOGIN -->
 <div id="login" class="screen active">
-  <div class="login-wrap">
-    <div class="text-center mb-7">
-      <span class="text-5xl block mb-2" style="animation:bob 3s ease-in-out infinite">🥞</span>
-      <div class="font-syne font-extrabold text-4xl text-white tracking-tight">Crew <span class="text-primary-container">App</span></div>
-      <div class="text-xs text-white/30 tracking-[3px] uppercase mt-1">Staff Sign-Up Portal</div>
+  <div id="loginBg">
+    <div class="lb-greet-wrap">
+      <div class="lb-mark">🥞</div>
+      <div class="lb-greet"><span id="lbGreetTime">Welcome</span> <span class="amber">back</span></div>
+      <div class="lb-greet-sub" id="lbHint">Enter your 4-digit code</div>
     </div>
-    <div class="bg-white/[.07] border border-white/10 rounded-2xl p-5">
-      <div class="text-[10px] font-bold tracking-[2.5px] uppercase text-white/35 mb-3">Select your name</div>
-      <div class="grid grid-cols-2 gap-2 mb-4" id="nameGrid"></div>
-      <div id="crewPwWrap" class="mb-3 js-hidden">
-        <div class="text-[10px] font-bold tracking-[2px] uppercase text-white/35 mb-2">Password</div>
-        <input class="w-full bg-white/10 border-[1.5px] border-white/[.18] rounded-xl py-3 px-4 text-white text-base tracking-[4px] outline-none focus:border-primary-container" type="password" id="crewPwIn" placeholder="Enter password" maxlength="20" autocomplete="off">
-      </div>
-      <button class="w-full bg-primary-container rounded-2xl py-4 font-syne font-extrabold text-base text-on-primary-fixed transition-all active:scale-[.97] disabled:opacity-30 disabled:pointer-events-none" id="goBtn" disabled onclick="doLogin()">Let's go →</button>
-      <div id="loginErr" class="text-red-300 text-xs text-center mt-2 min-h-[16px]"></div>
-      <div class="text-center mt-3"><button class="bg-transparent border-none text-white/30 text-xs underline underline-offset-[3px]" onclick="toggleAdm()">Admin? Click here</button></div>
-      <div id="admPanel" class="js-hidden mt-3 border-t border-white/[.08] pt-3">
-        <div class="text-[10px] font-bold tracking-[2.5px] uppercase text-white/35 mb-2 mt-1">Admin PIN</div>
-        <div class="flex gap-2">
-          <input class="flex-1 bg-white/10 border-[1.5px] border-white/[.18] rounded-xl py-3 px-4 text-white text-xl tracking-[8px] text-center outline-none focus:border-primary-container" type="password" inputmode="numeric" maxlength="4" placeholder="••••" id="pinIn" autocomplete="off">
-          <button class="bg-primary-container rounded-xl px-5 font-syne font-extrabold text-base text-on-primary-fixed active:scale-[.95]" onclick="doAdminLogin()">→</button>
-        </div>
-        <div class="text-red-300 text-xs text-center mt-2 min-h-[16px]" id="pinErr"></div>
-      </div>
+    <div class="pin-dots" id="pinDots">
+      <span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span>
+    </div>
+    <div class="pin-err" id="loginErr">&nbsp;</div>
+    <div class="keypad" id="keypad">
+      <button class="key" data-k="1">1<span class="sub">&nbsp;</span></button>
+      <button class="key" data-k="2">2<span class="sub">ABC</span></button>
+      <button class="key" data-k="3">3<span class="sub">DEF</span></button>
+      <button class="key" data-k="4">4<span class="sub">GHI</span></button>
+      <button class="key" data-k="5">5<span class="sub">JKL</span></button>
+      <button class="key" data-k="6">6<span class="sub">MNO</span></button>
+      <button class="key" data-k="7">7<span class="sub">PQRS</span></button>
+      <button class="key" data-k="8">8<span class="sub">TUV</span></button>
+      <button class="key" data-k="9">9<span class="sub">WXYZ</span></button>
+      <button class="key key-blank" data-k=""></button>
+      <button class="key" data-k="0">0</button>
+      <button class="key key-action" data-k="del" aria-label="Delete">
+        <svg width="22" height="20" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M9 1h12a2 2 0 012 2v16a2 2 0 01-2 2H9l-7-10z"/><path d="M12 7l6 8M18 7l-6 8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="lb-meta">
+      <span class="lb-meta-l">v1.5 · synced ✓</span>
+      <button class="lb-meta-l lb-meta-link" onclick="resetPinHint()">Forgot code?</button>
     </div>
   </div>
 </div>
@@ -419,9 +549,17 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
     <div id="pageMyShifts" class="page">
       <div class="p-4">
         <div class="rounded-2xl p-5 text-white relative overflow-hidden mb-4" id="earnHero">
-          <div class="text-[10px] font-bold tracking-[2px] uppercase opacity-60">This month</div>
-          <div class="font-syne font-extrabold text-[42px] tracking-tight leading-none mt-1" id="ehVal">RM 0</div>
-          <div class="text-sm opacity-60 mt-1" id="ehSub">–</div>
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[10px] font-bold tracking-[2px] uppercase opacity-60">This month</div>
+              <div class="font-syne font-extrabold text-[42px] tracking-tight leading-none mt-1" id="ehVal">RM 0</div>
+              <div class="text-sm opacity-60 mt-1" id="ehSub">–</div>
+            </div>
+            <div class="payout-pill" id="ehPayoutPill" style="display:none">
+              <span class="lbl" id="ehPayoutLbl">Payout</span>
+              <span class="amt" id="ehPayoutAmt">RM0</span>
+            </div>
+          </div>
           <div class="grid grid-cols-2 gap-2 mt-3">
             <div class="bg-white/[.14] rounded-xl py-2.5 px-3.5"><div class="font-syne font-extrabold text-xl" id="ehShifts">0</div><div class="text-[11px] opacity-60 mt-0.5 font-medium">Shifts</div></div>
             <div class="bg-white/[.14] rounded-xl py-2.5 px-3.5"><div class="font-syne font-extrabold text-xl" id="ehHours">0h</div><div class="text-[11px] opacity-60 mt-0.5 font-medium">Hours</div></div>
@@ -513,9 +651,51 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 
     <!-- ADMIN PAGE -->
     <div id="pageAdmin" class="page">
-      <div class="p-4">
-        <div class="adm-tabs mb-4">
-          <button class="at active" onclick="switchAt('export',this)">📋</button>
+      <!-- ADMIN HOME VIEW (default) -->
+      <div id="admHome" class="adm-home-view">
+        <div class="adm-head">
+          <div>
+            <div class="adm-title">Admin</div>
+            <div class="adm-sub" id="admHomeSub">What needs doing</div>
+          </div>
+          <button class="adm-icon-btn" onclick="goNotifs()" title="Notifications">🔔<span class="badge" id="admHomeNotifBadge"></span></button>
+        </div>
+
+        <div class="alerts-card" id="admAlertsCard">
+          <div class="alerts-head">
+            <span class="lbl">Needs attention</span>
+            <span class="count" id="admAlertCount">0</span>
+          </div>
+          <div id="admAlertList"></div>
+        </div>
+
+        <div class="tools-label">Tools</div>
+        <div class="tool-grid">
+          <button class="tool" onclick="openAdminTool('setup')"><div class="ic">🗓</div><div class="l">Schedule Setup</div></button>
+          <button class="tool tool-amber" onclick="openAdminTool('swaps')"><div class="ic">🔄</div><div class="l">Swaps</div><span class="t-badge" id="admBadgeSwaps"></span></button>
+          <button class="tool tool-amber" onclick="openAdminTool('invAdmin')"><div class="ic">📦</div><div class="l">Inventory</div><span class="t-badge" id="admBadgeInv"></span></button>
+          <button class="tool tool-amber" onclick="openAdminTool('tasksAdmin')"><div class="ic">📝</div><div class="l">Tasks</div><span class="t-badge" id="admBadgeTasks"></span></button>
+          <button class="tool" onclick="openAdminTool('fbAdmin')"><div class="ic">💬</div><div class="l">Feedback</div><span class="t-badge" id="admBadgeFb"></span></button>
+          <button class="tool" onclick="openAdminTool('crew')"><div class="ic">👥</div><div class="l">Crew</div></button>
+          <button class="tool" onclick="openAdminTool('heatmap')"><div class="ic">🗺</div><div class="l">Heatmap</div></button>
+          <button class="tool" onclick="openAdminTool('export')"><div class="ic">📋</div><div class="l">Export</div></button>
+          <button class="tool" onclick="openAdminTool('pushAdmin')"><div class="ic">🔔</div><div class="l">Notify</div></button>
+          <button class="tool tool-good" onclick="openAdminTool('pay')"><div class="ic">💰</div><div class="l">Bayaran</div><span class="t-badge" id="admBadgePay"></span></button>
+          <button class="tool" onclick="openAdminTool('settings')"><div class="ic">⚙️</div><div class="l">Settings</div></button>
+          <button class="tool" onclick="openAdminTool('data')"><div class="ic">💾</div><div class="l">Backup</div></button>
+        </div>
+      </div>
+
+      <!-- ADMIN DRILL VIEW (when a tool is opened) -->
+      <div id="admDrill" class="adm-drill-view" style="display:none">
+        <div class="adm-drill-head">
+          <button class="adm-back" onclick="goAdminHome()">‹</button>
+          <div class="adm-drill-title" id="admDrillTitle">Tool</div>
+          <div style="width:36px"></div>
+        </div>
+        <div class="p-4">
+        <div class="adm-tabs mb-4" style="display:none">
+          <button class="at" onclick="switchAt('export',this)">📋</button>
           <button class="at" onclick="switchAt('heatmap',this)">🗺</button>
           <button class="at" onclick="switchAt('swaps',this)">🔄</button>
           <button class="at" onclick="switchAt('setup',this)">🗓</button>
@@ -655,12 +835,13 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
         </div>
         <div id="atData" class="asec"><div class="bg-white rounded-2xl p-4 shadow-syrup-sm"><div class="font-syne font-bold text-sm mb-2">💾 Data Backup</div><p class="text-sm text-on-surface-variant mb-3 leading-relaxed">Export all data as a local JSON backup.</p><button class="w-full bg-inverse-surface rounded-xl py-3 font-syne font-extrabold text-sm text-primary-container flex items-center justify-center gap-2" onclick="exportJSON()">⬇️ Export Backup</button></div></div>
       </div>
+      </div>
     </div>
   </div>
 
   <!-- CHAT -->
   <div id="pageChat">
-    <div class="chat-header"><span class="text-xl">🥞</span><div class="flex-1"><div class="chat-header-title">Crew Chat</div><div class="chat-header-sub" id="chatHeaderSub">Group</div></div></div>
+    <div class="chat-header"><div class="chat-header-icon">🥞</div><div class="flex-1"><div class="chat-header-title">Crew Chat</div><div class="chat-header-sub" id="chatHeaderSub"><span class="online-dot"></span>Group</div></div></div>
     <div class="reply-preview" id="replyPreview"><div class="reply-preview-txt" id="replyPreviewTxt">–</div><button class="reply-preview-x" onclick="cancelReply()">✕</button></div>
     <div class="chat-messages" id="chatMessages"></div>
     <div class="inline-emoji-tray" id="emojiTray">
@@ -818,29 +999,69 @@ async function pushScheduleDay(date){
 // ══════════════════════════════════════════
 // LOGIN
 // ══════════════════════════════════════════
+// LOGIN — PIN keypad
+// ══════════════════════════════════════════
+let _pinBuf='';
 function buildGrid(){
-  const g=document.getElementById('nameGrid');g.innerHTML='';
-  S.staff.forEach(name=>{const btn=document.createElement('button');btn.className='nchip';btn.style.setProperty('--c',gc(name));btn.innerHTML=`<span>${name}</span>`;btn.onclick=()=>pick(name,btn);g.appendChild(btn);});
+  // Set greeting based on time of day
+  const h=new Date().getHours();
+  const greet=h<5?'Late':h<12?'Morning':h<17?'Afternoon':h<20?'Evening':'Night';
+  const el=document.getElementById('lbGreetTime');if(el)el.textContent=greet;
+  // Wire up keypad if not already wired
+  const kp=document.getElementById('keypad');
+  if(kp&&!kp.dataset.wired){
+    kp.dataset.wired='1';
+    kp.querySelectorAll('.key').forEach(b=>{
+      b.addEventListener('click',()=>{
+        const k=b.dataset.k;if(!k)return;
+        if(k==='del'){pinBackspace();return;}
+        pinPress(k);
+      });
+    });
+  }
+  resetPinHint();
 }
-function pick(name,btn){
-  selName=name;document.querySelectorAll('.nchip').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');
-  const hasPw=S.passwords[name]&&S.passwords[name].length>0;
-  const pw=document.getElementById('crewPwWrap');
-  if(hasPw)pw.classList.remove('js-hidden');else pw.classList.add('js-hidden');
-  if(hasPw)document.getElementById('crewPwIn').value='';
-  document.getElementById('goBtn').disabled=false;document.getElementById('loginErr').textContent='';
+function pinPress(d){
+  if(_pinBuf.length>=4)return;
+  _pinBuf+=d;
+  updatePinDots();
+  if(_pinBuf.length===4)setTimeout(submitPin,160);
 }
-function doLogin(){
-  if(!selName)return;
-  const hasPw=S.passwords[selName]&&S.passwords[selName].length>0;
-  if(hasPw&&document.getElementById('crewPwIn').value!==S.passwords[selName]){document.getElementById('loginErr').textContent='Wrong password. Try again.';document.getElementById('crewPwIn').value='';return;}
-  launch(selName,false);
+function pinBackspace(){_pinBuf=_pinBuf.slice(0,-1);updatePinDots();document.getElementById('loginErr').innerHTML='&nbsp;';}
+function updatePinDots(){
+  const dots=document.querySelectorAll('#pinDots .pin-dot');
+  dots.forEach((d,i)=>d.classList.toggle('filled',i<_pinBuf.length));
 }
-function toggleAdm(){document.getElementById('admPanel').classList.toggle('js-hidden');}
-function doAdminLogin(){
-  if(document.getElementById('pinIn').value===S.settings.adminPin)launch('Admin',true);
-  else document.getElementById('pinErr').textContent='Wrong PIN.';
+function pinShake(){
+  const dots=document.getElementById('pinDots');
+  dots.classList.add('shake');
+  setTimeout(()=>{dots.classList.remove('shake');_pinBuf='';updatePinDots();},420);
 }
+function submitPin(){
+  const pin=_pinBuf;
+  // Admin first (admin PIN always wins for security)
+  if(pin===S.settings.adminPin){launch('Admin',true);return;}
+  // Then match against staff PINs
+  let matchedStaff=null;
+  for(const name of S.staff){
+    if(S.passwords[name]&&S.passwords[name]===pin){matchedStaff=name;break;}
+  }
+  if(matchedStaff){launch(matchedStaff,false);return;}
+  document.getElementById('loginErr').textContent='Code tak betul. Try lagi.';
+  pinShake();
+}
+function resetPinHint(){
+  _pinBuf='';updatePinDots();
+  const e=document.getElementById('loginErr');if(e)e.innerHTML='&nbsp;';
+  const h=document.getElementById('lbHint');if(h)h.textContent='Enter your 4-digit code';
+}
+// Keyboard support (desktop testing)
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('login').classList.contains('active'))return;
+  if(/^[0-9]$/.test(e.key)){pinPress(e.key);e.preventDefault();}
+  else if(e.key==='Backspace'){pinBackspace();e.preventDefault();}
+  else if(e.key==='Enter'&&_pinBuf.length===4)submitPin();
+});
 function launch(user,isAdmin){
   sess={user,isAdmin};
   document.getElementById('login').classList.remove('active');document.getElementById('app').classList.add('active');
@@ -859,11 +1080,8 @@ function doLogout(){
   pushSub=null;pushPrefs=null;
   selName=null;sess={user:null,isAdmin:false};
   document.getElementById('login').classList.add('active');document.getElementById('app').classList.remove('active');
-  document.querySelectorAll('.nchip').forEach(b=>b.classList.remove('sel'));
-  document.getElementById('goBtn').disabled=true;document.getElementById('crewPwWrap').classList.add('js-hidden');
-  document.getElementById('crewPwIn').value='';document.getElementById('pinIn').value='';
-  document.getElementById('pinErr').textContent='';document.getElementById('loginErr').textContent='';
-  document.getElementById('admPanel').classList.add('js-hidden');document.getElementById('announceBar').classList.remove('show');
+  resetPinHint();
+  const ab=document.getElementById('announceBar');if(ab)ab.classList.remove('show');
 }
 
 // ══════════════════════════════════════════
@@ -891,7 +1109,7 @@ async function saveAnnounce(){
 async function clearAnnounce(){S.announcement='';document.getElementById('annInput').value='';await pushSettings();updateAnnouncementBar();toast('Cleared ✓');}
 function updateNotifDot(){const dot=document.getElementById('notifDot');if(!dot)return;const show=sess.isAdmin?S.swapRequests.length>0:getMyWeekShifts().length>0;dot.style.display=show?'block':'none';}
 function getMyWeekShifts(){const today=new Date();today.setHours(0,0,0,0);const end=new Date(today);end.setDate(today.getDate()+7);return Object.entries(S.schedule).filter(([k,sch])=>{const d=new Date(k+'T00:00:00');return d>=today&&d<=end&&sch.claimed.includes(sess.user);}).map(([k])=>({date:new Date(k+'T00:00:00'),key:k}));}
-function goNotifs(){if(sess.isAdmin){goPage('Admin',document.querySelector('#adminNav .ntab:last-child'));switchAt('swaps',null);}else goPage('MyShifts',document.querySelectorAll('#staffNav .ntab')[1]);}
+function goNotifs(){if(sess.isAdmin){goPage('Admin',document.querySelector('#adminNav .ntab:last-child'));setTimeout(()=>openAdminTool('swaps'),50);}else goPage('MyShifts',document.querySelectorAll('#staffNav .ntab')[1]);}
 
 // ══════════════════════════════════════════
 // NAV
@@ -912,7 +1130,17 @@ function goPage(name,btn){
   const pg=document.getElementById('page'+name);if(pg)pg.classList.add('active');scroll.scrollTop=0;
   if(name==='Schedule'){renderSchedule();renderNotifBanner();}if(name==='MyShifts'){renderMyShifts();renderNotifPrefs();}if(name==='Leaderboard')renderLeaderboard();
   if(name==='Inventory')renderInventory();if(name==='Feedback')renderFeedback();if(name==='Tasks')renderTasks();
-  if(name==='Admin'){renderExport();renderSetup();renderCrewList();loadSettingsForm();renderHeatmap();renderSwapList();renderAdminInventory();renderAdminFeedback();renderAdminTasks();}
+  if(name==='Admin'){
+    // Show home view by default; ensure drill is hidden
+    const home=document.getElementById('admHome');const drill=document.getElementById('admDrill');
+    if(home)home.style.display='block';
+    if(drill)drill.style.display='none';
+    // Pre-warm data so badges are accurate
+    renderExport();renderSetup();renderCrewList();loadSettingsForm();renderHeatmap();renderSwapList();renderAdminInventory();renderAdminFeedback();renderAdminTasks();
+    // Load payments cache for unpaid badge
+    if(typeof loadPayments==='function')loadPayments().then(()=>renderAdminHome());
+    renderAdminHome();
+  }
 }
 
 // ══════════════════════════════════════════
@@ -936,39 +1164,93 @@ function renderSchedule(){
 }
 
 function buildList(days){
-  const list=document.getElementById('schedList');list.innerHTML='';const today=new Date();today.setHours(0,0,0,0);
+  const list=document.getElementById('schedList');list.innerHTML='';
+  const today=new Date();today.setHours(0,0,0,0);
   groupWeeks(days).forEach((wk,wi)=>{
-    const sep=document.createElement('div');sep.className='flex items-center gap-2.5 my-4 px-0.5';
-    sep.innerHTML=`<div class="flex-1 h-px bg-outline-variant/50"></div><div class="text-[10px] font-bold tracking-[2px] uppercase text-on-surface-variant whitespace-nowrap">Week ${wi+1}</div><div class="flex-1 h-px bg-outline-variant/50"></div>`;
+    const sep=document.createElement('div');sep.className='week-sep';
+    sep.innerHTML='<div class="line"></div><div class="lbl">Week '+(wi+1)+'</div><div class="line"></div>';
     list.appendChild(sep);
     wk.forEach(d=>{
       const key=dk(d),sch=S.schedule[key];if(!sch)return;
       const isPast=d<today,isToday=d.getTime()===today.getTime();
-      const row=document.createElement('div');row.className='flex items-start gap-2.5 py-2.5 border-b border-outline-variant/30';row.id=`dr_${key}`;
-      const badgeColor=isToday?'text-primary':isPast?'text-on-surface-variant/40':'text-on-surface';
-      let html=`<div class="w-11 flex-shrink-0 text-center ${badgeColor}"><div class="text-[10px] font-bold tracking-[1px] uppercase">${DS[d.getDay()]}</div><div class="font-syne font-extrabold text-xl leading-tight">${d.getDate()}</div></div><div class="flex-1"><div class="flex flex-wrap gap-1.5 items-center">`;
-      for(let si=0;si<sch.slots;si++)html+=buildChip(key,si,sch.claimed[si],isPast,d);
-      // FT display
+      const dow=d.getDay(),isWeekend=dow===0||dow===6;
+      const isMine=sch.claimed&&sch.claimed.includes(sess.user);
+      const card=document.createElement('div');
+      let cls='day-card';
+      if(isToday)cls+=' today';
+      else if(isPast)cls+=' past';
+      if(isMine&&!sess.isAdmin)cls+=' mine';
+      card.className=cls;card.id='dr_'+key;
+      // Header
+      let html='<div class="dh"><div class="dn">';
+      html+='<span class="dnum">'+d.getDate()+'</span>';
+      html+='<span class="ddow'+(isWeekend?' weekend':'')+'">'+DS[d.getDay()]+'</span>';
+      if(isToday)html+='<span class="badge-today">today</span>';
+      html+='</div>';
+      if(isMine&&!sess.isAdmin)html+='<span class="badge-mine">★ mine</span>';
+      html+='</div>';
+      // Chips
+      html+='<div class="chips">';
+      const slots=sch.slots||0;
+      let hasAnyContent=false;
+      for(let si=0;si<slots;si++){html+=buildChip(key,si,sch.claimed[si],isPast,d);hasAnyContent=true;}
+      // Full-timer slots
       const ft=S.ftSchedule[key];
-      if(ft){for(let fi=0;fi<(ft.slots||0);fi++){const assigned=(ft.assigned||[])[fi];if(assigned){const col=gc(assigned);html+=`<div class="chip-taken" style="background:${col};box-shadow:0 2px 8px ${rgba(col,.3)};opacity:.85"><span style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5)"></span>${assigned}<span style="font-size:10px;background:rgba(255,255,255,.25);border-radius:4px;padding:1px 5px;margin-left:2px">FT</span></div>`;}else if(sess.isAdmin){html+=`<div class="chip-admin" onclick="adminAssignFT('${key}',${fi})">+ FT</div>`;}}}
-      if(sess.isAdmin)S.staff.forEach(n=>{const av=S.availability[n];if(av&&av[DS[d.getDay()]]===false)html+=`<span class="avail-off-chip">🚫 ${n}</span>`;});
-      html+='</div>';if(sch.note)html+=`<div class="text-[11px] text-primary mt-1.5 py-1 px-2.5 bg-primary-fixed rounded-lg border-l-[3px] border-primary-container">📝 ${sch.note}</div>`;html+='</div>';
-      row.innerHTML=html;list.appendChild(row);
+      if(ft&&ft.slots){
+        for(let fi=0;fi<ft.slots;fi++){
+          const a=(ft.assigned||[])[fi];
+          if(a){const col=gc(a);hasAnyContent=true;
+            html+='<span class="ch-taken" style="background:'+col+';opacity:.9"><span class="ch-av" style="background:rgba(255,255,255,.25);color:#fff">'+a[0]+'</span>'+a+'<span class="ch-ft">FT</span></span>';
+          }else if(sess.isAdmin){hasAnyContent=true;
+            html+='<span class="ch-admin-add" onclick="adminAssignFT(\''+key+'\','+fi+')">+ FT</span>';
+          }
+        }
+      }
+      // Availability off (admin view)
+      if(sess.isAdmin){
+        S.staff.forEach(n=>{const av=S.availability[n];if(av&&av[DS[d.getDay()]]===false){html+='<span class="ch-avail-off">🚫 '+n+'</span>';hasAnyContent=true;}});
+      }
+      if(!hasAnyContent)html+='<span class="ch-empty">no shifts</span>';
+      html+='</div>';
+      // Note
+      if(sch.note)html+='<span class="day-note">📝 '+sch.note+'</span>';
+      card.innerHTML=html;list.appendChild(card);
     });
   });
 }
 
 function buildChip(key,si,claimed,isPast,d){
-  if(claimed){const col=gc(claimed),isMe=claimed===sess.user;const swapReq=S.swapRequests.find(r=>r.key===key&&r.si===si&&r.user===claimed);const swapBadge=swapReq?'<span class="swap-badge">swap?</span>':'';const rmBtn=sess.isAdmin?`<button class="chip-remove" onclick="event.stopPropagation();adminRm('${key}',${si})">✕</button>`:'';const swapBtn=isMe&&!isPast?`<button class="chip-remove" style="opacity:.5;font-size:12px" onclick="event.stopPropagation();openSwapModal('${key}',${si})">🔄</button>`:'';return`<div class="chip-taken${isMe?' mine':''}" style="background:${col};box-shadow:0 2px 8px ${rgba(col,.3)}" id="chip_${key}_${si}"><span style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);flex-shrink:0"></span>${claimed}${swapBadge}${rmBtn}${swapBtn}</div>`;}
-  if(isPast&&!sess.isAdmin)return'<span class="text-xs text-on-surface-variant/40">–</span>';
-  if(sess.isAdmin)return`<div class="chip-admin" id="chip_${key}_${si}" onclick="adminAssign('${key}',${si})">+ Assign</div>`;
+  if(claimed){
+    const col=gc(claimed),isMe=claimed===sess.user;
+    const swapReq=S.swapRequests.find(r=>r.key===key&&r.si===si&&r.user===claimed);
+    let h='<span class="ch-taken'+(isMe?' mine':'')+'" id="chip_'+key+'_'+si+'" style="background:'+col+'">';
+    h+='<span class="ch-av" style="background:rgba(255,255,255,.3);color:#fff">'+claimed[0]+'</span>'+claimed;
+    if(swapReq)h+='<span class="swap-pill">swap?</span>';
+    if(sess.isAdmin)h+='<button class="ch-mini x" onclick="event.stopPropagation();adminRm(\''+key+'\','+si+')" title="Remove">×</button>';
+    if(isMe&&!isPast)h+='<button class="ch-mini" onclick="event.stopPropagation();openSwapModal(\''+key+'\','+si+')" title="Request swap">⇄</button>';
+    h+='</span>';
+    return h;
+  }
+  if(isPast&&!sess.isAdmin)return'<span class="ch-empty">–</span>';
+  if(sess.isAdmin)return'<span class="ch-admin-add" id="chip_'+key+'_'+si+'" onclick="adminAssign(\''+key+'\','+si+')">+ Assign</span>';
   const sch=S.schedule[key],avail=S.availability[sess.user];
-  if(avail&&avail[DS[d.getDay()]]===false)return'<span class="text-xs text-error italic">🚫 Unavailable</span>';
-  if(sch&&sch.claimed.includes(sess.user))return'<span class="text-xs text-on-surface-variant italic">Slot taken</span>';
-  return`<div class="chip-claim" id="chip_${key}_${si}" onclick="claim('${key}',${si},this)"><span class="hand">✋</span><span>Claim</span></div>`;
+  if(avail&&avail[DS[d.getDay()]]===false)return'<span class="ch-avail-off">🚫 Unavailable</span>';
+  if(sch&&sch.claimed.includes(sess.user))return'<span class="ch-empty">slot taken</span>';
+  return'<span class="ch-claim" id="chip_'+key+'_'+si+'" onclick="claim(\''+key+'\','+si+',this)">✋ claim slot</span>';
 }
 
-async function claim(key,si,el){const sch=S.schedule[key];if(!sch||sch.claimed[si])return;if(sch.claimed.includes(sess.user)){toast('You already have a slot today! 😄');return;}sch.claimed[si]=sess.user;const col=gc(sess.user);const newEl=document.createElement('div');newEl.className='chip-taken mine stamping';newEl.id=`chip_${key}_${si}`;newEl.style.cssText=`background:${col};box-shadow:0 2px 8px ${rgba(col,.3)}`;newEl.innerHTML=`<span style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5)"></span>${sess.user}<button class="chip-remove" style="opacity:.5;font-size:12px" onclick="event.stopPropagation();openSwapModal('${key}',${si})">🔄</button>`;el.replaceWith(newEl);newEl.addEventListener('animationend',()=>newEl.style.animation='none',{once:true});spawnConfetti();const d=new Date(key+'T00:00:00');toast(`🎉 Slot confirmed! ${DS[d.getDay()]} ${d.getDate()}/${String(d.getMonth()+1).padStart(2,'0')}`);const row=document.getElementById('dr_'+key);if(row)row.querySelectorAll('.chip-claim').forEach(c=>{c.outerHTML='<span class="text-xs text-on-surface-variant italic">Slot taken</span>';});updateTally();await pushScheduleDay(key);await ensurePayment(sess.user,key);}
+async function claim(key,si,el){
+  const sch=S.schedule[key];if(!sch||sch.claimed[si])return;
+  if(sch.claimed.includes(sess.user)){toast('You already have a slot today! 😄');return;}
+  sch.claimed[si]=sess.user;
+  spawnConfetti();
+  const d=new Date(key+'T00:00:00');
+  toast('🎉 Slot confirmed! '+DS[d.getDay()]+' '+d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0'));
+  updateTally();
+  renderSchedule();
+  await pushScheduleDay(key);
+  await ensurePayment(sess.user,key);
+}
 async function adminRm(key,si){const removed=S.schedule[key].claimed[si];if(!confirm(`Remove ${removed}?`))return;S.schedule[key].claimed[si]=null;await pushScheduleDay(key);await removePaymentIfUnpaid(removed,key);renderSchedule();toast('Removed ✓');}
 async function adminAssign(key,si){const name=prompt('Assign to:');if(!name?.trim())return;const t=name.trim();if(S.schedule[key].claimed.includes(t)){alert('Already on this day.');return;}S.schedule[key].claimed[si]=t;if(!S.staff.includes(t)){S.staff.push(t);gc(t);}await pushScheduleDay(key);await pushSettings();await ensurePayment(t,key);renderSchedule();toast(`Assigned ${t} ✓`);}
 async function adminAssignFT(key,fi){const name=prompt('Assign full-timer:');if(!name?.trim())return;const t=name.trim();if(!S.ftSchedule[key])S.ftSchedule[key]={slots:0,assigned:[]};S.ftSchedule[key].assigned[fi]=t;if(!S.staff.includes(t)){S.staff.push(t);gc(t);}await pushSettings();renderSchedule();toast(`FT assigned: ${t} ✓`);}
@@ -982,7 +1264,7 @@ async function confirmSwap(){const{key,si}=swapPending;const reason=document.get
 // ══════════════════════════════════════════
 // MY SHIFTS
 // ══════════════════════════════════════════
-function renderMyShifts(){
+async function renderMyShifts(){
   const{y,m}=curM,days=getDays(y,m),col=gc(sess.user);
   const mine=days.filter(d=>{const sch=S.schedule[dk(d)];return sch&&sch.claimed.includes(sess.user);});
   const sh=mine.length,hrs=sh*S.settings.hours,earn=sh*S.settings.rate;
@@ -990,9 +1272,44 @@ function renderMyShifts(){
   document.getElementById('ehVal').textContent=`RM ${earn}`;document.getElementById('ehSub').textContent=`${ME[m]} ${y}`;
   document.getElementById('ehShifts').textContent=sh;document.getElementById('ehHours').textContent=`${hrs}h`;
   renderAvailGrid();
+
+  // Load payments for this user (used for paid status + payout pill)
+  let myPayments=[];
+  try{
+    const{data}=await db.from('payments').select('*').eq('staff_name',sess.user);
+    myPayments=data||[];
+  }catch(e){console.warn('payments fetch',e);}
+  const payByDate={};myPayments.forEach(p=>{payByDate[p.shift_date]=p;});
+
+  // Compute payout pill (sum of unpaid for this user)
+  const unpaid=myPayments.filter(p=>!p.paid_status);
+  const unpaidTotal=unpaid.reduce((s,p)=>s+Number(p.amount||S.settings.rate),0);
+  const pill=document.getElementById('ehPayoutPill');
+  if(unpaidTotal>0){
+    // Find next Saturday
+    const today=new Date();const dow=today.getDay();const daysToSat=(6-dow+7)%7||7;
+    const nextSat=new Date(today);nextSat.setDate(today.getDate()+daysToSat);
+    document.getElementById('ehPayoutLbl').textContent=`Payout ${DS[6]} ${nextSat.getDate()}/${nextSat.getMonth()+1}`;
+    document.getElementById('ehPayoutAmt').textContent=`RM${unpaidTotal}`;
+    pill.style.display='';
+  }else{
+    pill.style.display='none';
+  }
+
+  // Time-of-day icon (stall is 7:30PM-12:30AM = night)
+  const timeIco='🌙';
   const list=document.getElementById('msList');
   if(!mine.length){list.innerHTML='<div class="text-center py-12"><div class="text-5xl mb-3">⭐</div><div class="font-syne font-bold text-lg">No shifts yet</div><div class="text-sm text-on-surface-variant">Go claim a slot!</div></div>';return;}
-  list.innerHTML=mine.map(d=>{const key=dk(d),sch=S.schedule[key];const swapReq=S.swapRequests.find(r=>r.key===key&&r.user===sess.user);const swapTxt=swapReq?`<button class="bg-error-container border-none rounded-lg px-2.5 py-1 text-[11px] font-bold text-on-error-container mt-1.5" onclick="cancelSwap(${swapReq.id})">🔄 Cancel swap</button>`:`<button class="bg-surface-container-high border-none rounded-lg px-2.5 py-1 text-[11px] font-bold text-on-surface-variant mt-1.5" onclick="openSwapModal('${key}',${sch.claimed.indexOf(sess.user)})">🔄 Swap</button>`;return`<div class="bg-white rounded-2xl p-3.5 shadow-syrup-sm mb-2 flex items-center gap-3"><div class="w-11 h-11 rounded-xl flex flex-col items-center justify-center flex-shrink-0" style="background:${col}"><div class="text-[9px] font-bold uppercase tracking-[1px] text-white/75">${DS[d.getDay()]}</div><div class="font-syne font-extrabold text-lg text-white leading-none">${d.getDate()}</div></div><div class="flex-1"><div class="font-syne font-bold text-sm">${DF[d.getDay()]}, ${d.getDate()} ${ME[d.getMonth()]}</div><div class="text-xs text-on-surface-variant mt-0.5">${S.settings.time}</div>${sch.note?`<div class="text-[11px] text-primary mt-1">📝 ${sch.note}</div>`:''}${swapTxt}</div><div class="font-syne font-extrabold text-base text-primary">RM${S.settings.rate}</div></div>`;}).join('');
+  list.innerHTML=mine.map(d=>{
+    const key=dk(d),sch=S.schedule[key];
+    const swapReq=S.swapRequests.find(r=>r.key===key&&r.user===sess.user);
+    const swapTxt=swapReq?`<button class="bg-error-container border-none rounded-lg px-2.5 py-1 text-[11px] font-bold text-on-error-container mt-1.5" onclick="cancelSwap(${swapReq.id})">🔄 Cancel swap</button>`:`<button class="bg-surface-container-high border-none rounded-lg px-2.5 py-1 text-[11px] font-bold text-on-surface-variant mt-1.5" onclick="openSwapModal('${key}',${sch.claimed.indexOf(sess.user)})">🔄 Swap</button>`;
+    const pay=payByDate[key];
+    const paidPill=pay
+      ?(pay.paid_status?'<span class="shift-paid-pill">✓ paid</span>':'<span class="shift-unpaid-pill">unpaid</span>')
+      :'';
+    return `<div class="bg-white rounded-2xl p-3.5 shadow-syrup-sm mb-2 flex items-center gap-3"><div class="w-11 h-11 rounded-xl flex flex-col items-center justify-center flex-shrink-0" style="background:${col}"><div class="text-[9px] font-bold uppercase tracking-[1px] text-white/75">${DS[d.getDay()]}</div><div class="font-syne font-extrabold text-lg text-white leading-none">${d.getDate()}</div></div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap"><div class="font-syne font-bold text-sm">${DF[d.getDay()]}, ${d.getDate()} ${ME[d.getMonth()]}</div>${paidPill}</div><div class="text-xs text-on-surface-variant mt-0.5"><span class="shift-time-ico">${timeIco}</span>${S.settings.time}</div>${sch.note?`<div class="text-[11px] text-primary mt-1">📝 ${sch.note}</div>`:''}${swapTxt}</div><div class="font-syne font-extrabold text-base text-primary">RM${pay?.amount||S.settings.rate}</div></div>`;
+  }).join('');
 }
 async function cancelSwap(id){await db.from('swap_requests').delete().eq('id',id);S.swapRequests=S.swapRequests.filter(r=>r.id!==id);renderMyShifts();updateNotifDot();toast('Swap cancelled');}
 function renderAvailGrid(){const grid=document.getElementById('availGrid');grid.innerHTML='';const avail=S.availability[sess.user]||{};DS.forEach(day=>{const isAvail=avail[day]!==false;const cell=document.createElement('div');cell.className='flex flex-col items-center gap-1';cell.innerHTML=`<span class="text-[9px] font-bold uppercase text-on-surface-variant tracking-[.5px]">${day}</span><button class="w-8 h-8 rounded-lg border-[1.5px] flex items-center justify-center text-sm ${isAvail?'bg-green-50 border-outline-variant':'bg-red-50 border-red-200'}" onclick="toggleAvail('${day}',this)">${isAvail?'✅':'🚫'}</button>`;grid.appendChild(cell);});}
@@ -1685,8 +2002,54 @@ function loadSettingsForm(){document.getElementById('setTime').value=S.settings.
 async function saveSettings(){S.settings.time=document.getElementById('setTime').value.trim()||S.settings.time;S.settings.rate=+document.getElementById('setRate').value||S.settings.rate;S.settings.hours=+document.getElementById('setHours').value||S.settings.hours;S.settings.hrRate=+document.getElementById('setHrRate').value||S.settings.hrRate;const p=document.getElementById('setPin').value.trim();if(p.length>=4)S.settings.adminPin=p;await pushSettings();toast('Settings saved ✅');renderExport();}
 
 // Crew
-function renderCrewList(){document.getElementById('crewList').innerHTML=S.staff.map((n,i)=>`<div class="bg-white rounded-2xl p-3 shadow-syrup-sm mb-2"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full flex items-center justify-center font-syne font-extrabold text-sm text-white flex-shrink-0" style="background:${gc(n)}">${n[0]}</div><div class="flex-1 font-syne font-bold text-[15px]">${n}</div><span class="text-[11px] text-on-surface-variant bg-surface-container-low border border-outline-variant/50 rounded-md px-2 py-0.5" style="font-family:monospace">${S.passwords[n]?'🔒':'🔓'}</span><button class="bg-transparent border-[1.5px] border-red-200 rounded-lg px-3 py-1 text-xs font-bold text-error" onclick="rmCrew(${i})">Remove</button></div><div class="flex gap-1.5 mt-2"><input class="flex-1 bg-surface-container-low border border-outline-variant rounded-xl py-2 px-3 text-sm tracking-wider outline-none focus:border-primary" style="font-family:monospace" type="text" placeholder="Set password" value="${S.passwords[n]||''}" id="cpw_${i}"><button class="bg-primary-container rounded-xl px-4 font-syne font-extrabold text-sm text-on-primary-fixed" onclick="saveCrewPw(${i},'${n}')">Save</button></div></div>`).join('');}
-async function saveCrewPw(i,name){S.passwords[name]=document.getElementById(`cpw_${i}`).value.trim();await pushSettings();renderCrewList();toast(S.passwords[name]?`PW set for ${name} 🔒`:`PW removed 🔓`);}
+function renderCrewList(){
+  const html=S.staff.map((n,i)=>{
+    const pin=S.passwords[n]||'';
+    const hasPin=pin.length===4;
+    return `<div class="bg-white rounded-2xl p-3 shadow-syrup-sm mb-2">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full flex items-center justify-center font-syne font-extrabold text-sm text-white flex-shrink-0" style="background:${gc(n)}">${n[0]}</div>
+        <div class="flex-1 font-syne font-bold text-[15px]">${n}</div>
+        <span class="text-[11px] font-bold rounded-md px-2 py-0.5 ${hasPin?'bg-secondary-fixed text-on-secondary-fixed-variant':'bg-error-container text-on-error-container'}">${hasPin?'PIN '+pin:'NO PIN'}</span>
+        <button class="bg-transparent border-[1.5px] border-red-200 rounded-lg px-3 py-1 text-xs font-bold text-error" onclick="rmCrew(${i})">×</button>
+      </div>
+      <div class="flex gap-1.5 mt-2">
+        <input class="flex-1 bg-surface-container-low border border-outline-variant rounded-xl py-2 px-3 text-base tracking-[6px] text-center outline-none focus:border-primary font-bold" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" value="${pin}" id="cpw_${i}">
+        <button class="bg-primary-container rounded-xl px-4 font-syne font-extrabold text-sm text-on-primary-fixed" onclick="saveCrewPw(${i},'${n.replace(/'/g,"\\'")}')">Save</button>
+      </div>
+    </div>`;
+  }).join('');
+  // Add helper button at top to auto-assign PINs to anyone missing
+  const missingPins=S.staff.filter(n=>!S.passwords[n]||S.passwords[n].length!==4).length;
+  const helper=missingPins>0?`<div class="bg-primary-fixed border border-primary-container/30 rounded-2xl p-3 mb-3"><div class="font-syne font-bold text-sm text-on-primary-fixed mb-1">⚠️ ${missingPins} crew tiada PIN</div><div class="text-[11px] text-on-primary-fixed-variant mb-2">Auto-generate unique 4-digit PINs untuk semua, atau set sendiri di bawah.</div><button class="bg-primary-container text-on-primary-fixed rounded-xl px-4 py-2 font-syne font-bold text-xs" onclick="autoAssignPins()">🎲 Auto-generate</button></div>`:'';
+  document.getElementById('crewList').innerHTML=helper+html;
+}
+async function saveCrewPw(i,name){
+  const v=document.getElementById(`cpw_${i}`).value.trim().replace(/[^0-9]/g,'');
+  if(v.length>0&&v.length!==4){toast('PIN mesti 4 digit');return;}
+  // Check uniqueness
+  if(v.length===4){
+    if(v===S.settings.adminPin){toast('PIN ni untuk Admin, pilih lain');return;}
+    for(const k of S.staff){if(k!==name&&S.passwords[k]===v){toast(`PIN sama dgn ${k}, pilih lain`);return;}}
+  }
+  S.passwords[name]=v;
+  await pushSettings();renderCrewList();
+  toast(v?`PIN ${v} for ${name} 🔒`:`PIN cleared 🔓`);
+}
+async function autoAssignPins(){
+  if(!confirm('Generate PINs untuk semua crew yang tiada PIN?'))return;
+  const used=new Set([S.settings.adminPin]);
+  Object.values(S.passwords).forEach(p=>{if(p&&p.length===4)used.add(p);});
+  let assigned=0;
+  S.staff.forEach(n=>{
+    if(S.passwords[n]&&S.passwords[n].length===4)return;
+    let pin;let tries=0;
+    do{pin=String(Math.floor(1000+Math.random()*9000));tries++;}while(used.has(pin)&&tries<200);
+    used.add(pin);S.passwords[n]=pin;assigned++;
+  });
+  await pushSettings();renderCrewList();
+  toast(`✓ ${assigned} PINs generated`);
+}
 async function addCrew(){const n=prompt('New crew member name:');if(!n?.trim())return;S.staff.push(n.trim());gc(n.trim());await pushSettings();buildGrid();renderCrewList();toast(`${n.trim()} added! 🎉`);}
 async function rmCrew(i){if(!confirm(`Remove ${S.staff[i]}?`))return;delete S.passwords[S.staff[i]];S.staff.splice(i,1);await pushSettings();buildGrid();renderCrewList();}
 
@@ -1698,7 +2061,7 @@ function switchAt(tab,btn){document.querySelectorAll('.at').forEach(b=>b.classLi
 // ══════════════════════════════════════════
 function subscribeChatRealtime(){if(chatChannel)return;chatChannel=db.channel('chat-room').on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},payload=>{const m=payload.new;const msg={id:m.id,user:m.user_name,text:m.text,ts:new Date(m.created_at).getTime(),replyTo:m.reply_to,reactions:m.reactions||{},deleted:m.deleted||false,system:m.system||false};if(!S.messages.find(x=>x.id===msg.id)){S.messages.push(msg);if(document.getElementById('pageChat').style.display==='flex')renderChat();else updateChatUnread();}}).on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages'},payload=>{const m=payload.new;const idx=S.messages.findIndex(x=>x.id===m.id);if(idx>=0){S.messages[idx].reactions=m.reactions||{};S.messages[idx].deleted=m.deleted||false;S.messages[idx].text=m.text||'';if(document.getElementById('pageChat').style.display==='flex')renderChat();}}).subscribe();}
 
-function renderChat(){const container=document.getElementById('chatMessages');container.innerHTML='';document.getElementById('chatHeaderSub').textContent=`${S.staff.length} crew`;let lastDate='',lastUser='';S.messages.forEach(msg=>{const d=new Date(msg.ts);const dateStr=d.toLocaleDateString('en-MY',{weekday:'short',day:'numeric',month:'short'});if(dateStr!==lastDate){const div=document.createElement('div');div.className='chat-date-divider';div.innerHTML=`<span class="chat-date-pill">${new Date().toDateString()===d.toDateString()?'Today':dateStr}</span>`;container.appendChild(div);lastDate=dateStr;lastUser='';}if(msg.system){const row=document.createElement('div');row.style.cssText='display:flex;justify-content:center;margin:4px 0';row.innerHTML=`<div class="msg-bubble system">${msg.text}</div>`;container.appendChild(row);lastUser='';return;}const isMe=msg.user===sess.user,isCont=msg.user===lastUser;const col=gc(msg.user),timeStr=d.toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'});const row=document.createElement('div');row.className=`msg-row${isMe?' mine':''}${isCont?' cont':''}`;const avEl=document.createElement('div');avEl.className=`msg-av${isCont?' ghost':''}`;avEl.style.background=col;avEl.textContent=msg.user[0];const contentEl=document.createElement('div');contentEl.className='msg-content';if(!isCont&&!isMe){const n=document.createElement('div');n.className='msg-name';n.style.color=col;n.textContent=msg.user;contentEl.appendChild(n);}const bubbleEl=document.createElement('div');bubbleEl.className=`msg-bubble ${isMe?'mine':'them'}`;if(isMe)bubbleEl.style.background=col;if(msg.replyTo){const orig=S.messages.find(m2=>m2.id===msg.replyTo.id);const snip=document.createElement('div');snip.className='msg-reply-snip';snip.innerHTML=`<strong>${msg.replyTo.user}</strong>: ${(orig?orig.text:msg.replyTo.text||'').slice(0,60)}`;bubbleEl.appendChild(snip);}bubbleEl.appendChild(document.createTextNode(msg.deleted?'🚫 Deleted':msg.text));let pt;bubbleEl.addEventListener('touchstart',()=>{pt=setTimeout(()=>showMsgMenu(msg,bubbleEl,isMe),500);},{passive:true});bubbleEl.addEventListener('touchend',()=>clearTimeout(pt));bubbleEl.addEventListener('touchmove',()=>clearTimeout(pt));bubbleEl.addEventListener('contextmenu',e=>{e.preventDefault();showMsgMenu(msg,bubbleEl,isMe);});contentEl.appendChild(bubbleEl);if(msg.reactions&&Object.keys(msg.reactions).length){const rr=document.createElement('div');rr.className='msg-reactions';Object.entries(msg.reactions).forEach(([emoji,users])=>{if(!users||!users.length)return;const b2=document.createElement('button');b2.className=`msg-react-btn${users.includes(sess.user)?' mine-react':''}`;b2.innerHTML=`${emoji}<span class="msg-react-count">${users.length}</span>`;b2.onclick=()=>toggleReaction(msg.id,emoji);rr.appendChild(b2);});contentEl.appendChild(rr);}const timeEl=document.createElement('div');timeEl.className='msg-time';timeEl.textContent=timeStr;contentEl.appendChild(timeEl);if(isMe){row.appendChild(contentEl);row.appendChild(avEl);}else{row.appendChild(avEl);row.appendChild(contentEl);}container.appendChild(row);lastUser=msg.user;});setTimeout(()=>{container.scrollTop=container.scrollHeight;},30);markSeen();}
+function renderChat(){const container=document.getElementById('chatMessages');container.innerHTML='';document.getElementById('chatHeaderSub').innerHTML=`<span class="online-dot"></span>${S.staff.length} crew`;let lastDate='',lastUser='';S.messages.forEach(msg=>{const d=new Date(msg.ts);const dateStr=d.toLocaleDateString('en-MY',{weekday:'short',day:'numeric',month:'short'});if(dateStr!==lastDate){const div=document.createElement('div');div.className='chat-date-divider';div.innerHTML=`<span class="chat-date-pill">${new Date().toDateString()===d.toDateString()?'Today':dateStr}</span>`;container.appendChild(div);lastDate=dateStr;lastUser='';}if(msg.system){const row=document.createElement('div');row.style.cssText='display:flex;justify-content:center;margin:4px 0';row.innerHTML=`<div class="msg-bubble system">${msg.text}</div>`;container.appendChild(row);lastUser='';return;}const isMe=msg.user===sess.user,isCont=msg.user===lastUser;const col=gc(msg.user),timeStr=d.toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'});const row=document.createElement('div');row.className=`msg-row${isMe?' mine':''}${isCont?' cont':''}`;const avEl=document.createElement('div');avEl.className=`msg-av${isCont?' ghost':''}`;avEl.style.background=col;avEl.textContent=msg.user[0];const contentEl=document.createElement('div');contentEl.className='msg-content';if(!isCont&&!isMe){const n=document.createElement('div');n.className='msg-name';n.style.color=col;n.textContent=msg.user;contentEl.appendChild(n);}const bubbleEl=document.createElement('div');bubbleEl.className=`msg-bubble ${isMe?'mine':'them'}`;if(isMe)bubbleEl.style.background=col;if(msg.replyTo){const orig=S.messages.find(m2=>m2.id===msg.replyTo.id);const snip=document.createElement('div');snip.className='msg-reply-snip';snip.innerHTML=`<strong>${msg.replyTo.user}</strong>: ${(orig?orig.text:msg.replyTo.text||'').slice(0,60)}`;bubbleEl.appendChild(snip);}bubbleEl.appendChild(document.createTextNode(msg.deleted?'🚫 Deleted':msg.text));let pt;bubbleEl.addEventListener('touchstart',()=>{pt=setTimeout(()=>showMsgMenu(msg,bubbleEl,isMe),500);},{passive:true});bubbleEl.addEventListener('touchend',()=>clearTimeout(pt));bubbleEl.addEventListener('touchmove',()=>clearTimeout(pt));bubbleEl.addEventListener('contextmenu',e=>{e.preventDefault();showMsgMenu(msg,bubbleEl,isMe);});contentEl.appendChild(bubbleEl);if(msg.reactions&&Object.keys(msg.reactions).length){const rr=document.createElement('div');rr.className='msg-reactions';Object.entries(msg.reactions).forEach(([emoji,users])=>{if(!users||!users.length)return;const b2=document.createElement('button');b2.className=`msg-react-btn${users.includes(sess.user)?' mine-react':''}`;b2.innerHTML=`${emoji}<span class="msg-react-count">${users.length}</span>`;b2.onclick=()=>toggleReaction(msg.id,emoji);rr.appendChild(b2);});contentEl.appendChild(rr);}const timeEl=document.createElement('div');timeEl.className='msg-time';timeEl.textContent=timeStr;contentEl.appendChild(timeEl);if(isMe){row.appendChild(contentEl);row.appendChild(avEl);}else{row.appendChild(avEl);row.appendChild(contentEl);}container.appendChild(row);lastUser=msg.user;});setTimeout(()=>{container.scrollTop=container.scrollHeight;},30);markSeen();}
 
 function showMsgMenu(msg,bubbleEl,isMe){if(activeMsgMenu){activeMsgMenu.remove();activeMsgMenu=null;}if(msg.deleted)return;const menu=document.createElement('div');menu.className='emoji-picker';['❤️','😂','👍','🔥','😮','😢'].forEach(em=>{const b=document.createElement('span');b.className='emoji-opt';b.textContent=em;b.onclick=()=>{toggleReaction(msg.id,em);menu.remove();activeMsgMenu=null;};menu.appendChild(b);});const rb=document.createElement('span');rb.className='emoji-opt';rb.textContent='↩️';rb.onclick=()=>{setReply(msg);menu.remove();activeMsgMenu=null;};menu.appendChild(rb);if(isMe||sess.isAdmin){const db2=document.createElement('span');db2.className='emoji-opt';db2.textContent='🗑️';db2.onclick=()=>{deleteMsg(msg.id);menu.remove();activeMsgMenu=null;};menu.appendChild(db2);}document.body.appendChild(menu);activeMsgMenu=menu;const rect=bubbleEl.getBoundingClientRect(),mw=280;let left=isMe?rect.right-mw:rect.left;left=Math.max(8,Math.min(left,window.innerWidth-mw-8));menu.style.cssText=`position:fixed;left:${left}px;top:${rect.top>120?rect.top-56:rect.bottom+8}px`;setTimeout(()=>{const close=()=>{if(activeMsgMenu){activeMsgMenu.remove();activeMsgMenu=null;}};document.addEventListener('touchstart',close,{once:true});document.addEventListener('click',close,{once:true});},100);}
 async function toggleReaction(msgId,emoji){const msg=S.messages.find(m=>m.id===msgId);if(!msg)return;if(!msg.reactions)msg.reactions={};if(!msg.reactions[emoji])msg.reactions[emoji]=[];const idx=msg.reactions[emoji].indexOf(sess.user);if(idx>=0)msg.reactions[emoji].splice(idx,1);else msg.reactions[emoji].push(sess.user);await db.from('messages').update({reactions:msg.reactions}).eq('id',msgId);renderChat();}
@@ -1926,6 +2289,82 @@ async function addPaymentManual(){
     if(e.message?.includes('duplicate'))toast('Shift ni dah ada');
     else toast('Error: '+e.message);
   }
+}
+
+// ============================================================
+// ADMIN HOME — alerts + tool grid
+// ============================================================
+const ADM_TOOL_TITLES={
+  export:'Export Schedule',heatmap:'Attendance Heatmap',swaps:'Swap Requests',
+  setup:'Schedule Setup',settings:'Settings',crew:'Crew Members',
+  invAdmin:'Inventory',tasksAdmin:'Tasks',pushAdmin:'Notifications',
+  fbAdmin:'Team Feedback',pay:'Bayaran',data:'Data Backup'
+};
+function openAdminTool(tab){
+  document.getElementById('admHome').style.display='none';
+  document.getElementById('admDrill').style.display='block';
+  document.getElementById('admDrillTitle').textContent=ADM_TOOL_TITLES[tab]||'Tool';
+  switchAt(tab,null);
+  // Scroll to top
+  const scroll=document.getElementById('mainScroll');
+  if(scroll)scroll.scrollTop=0;
+}
+function goAdminHome(){
+  document.getElementById('admDrill').style.display='none';
+  document.getElementById('admHome').style.display='block';
+  renderAdminHome();
+}
+function renderAdminHome(){
+  if(!sess.isAdmin)return;
+  const today=new Date();const dayName=['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'][today.getDay()];
+  const monthName=ME[today.getMonth()];
+  document.getElementById('admHomeSub').textContent=`${dayName} · ${today.getDate()} ${monthName} · what needs doing`;
+
+  // Build alerts
+  const alerts=[];
+  // 1. Pending swap requests
+  const swapCount=(S.swapRequests||[]).length;
+  if(swapCount>0)alerts.push({ic:'🔄',txt:`${swapCount} swap request${swapCount>1?'s':''} waiting`,tab:'swaps',urgent:true});
+  // 2. Open shifts in next 7 days
+  const next7=[];const t0=new Date();t0.setHours(0,0,0,0);
+  for(let i=0;i<7;i++){const d=new Date(t0);d.setDate(t0.getDate()+i);next7.push(d);}
+  let openShifts=0;
+  next7.forEach(d=>{const sch=S.schedule[dk(d)];if(!sch)return;sch.claimed.slice(0,sch.slots).forEach(c=>{if(!c)openShifts++;});});
+  if(openShifts>0)alerts.push({ic:'📅',txt:`${openShifts} shift${openShifts>1?'s':''} unfilled this week`,tab:'setup',urgent:openShifts>=3});
+  // 3. Crew without PIN
+  const noPin=S.staff.filter(n=>!S.passwords[n]||S.passwords[n].length!==4).length;
+  if(noPin>0)alerts.push({ic:'🔒',txt:`${noPin} crew tiada PIN`,tab:'crew',urgent:false});
+  // 4. Unpaid payments
+  const unpaidCount=(_payCache||[]).filter(p=>!p.paid_status).length;
+  if(unpaidCount>0)alerts.push({ic:'💰',txt:`${unpaidCount} bayaran tertunggak`,tab:'pay',urgent:false});
+  // 5. Open tasks for tomorrow
+  const taskCount=(S.tasks||[]).filter(t=>!t.done).length;
+  if(taskCount>0)alerts.push({ic:'📝',txt:`${taskCount} tugasan terbuka`,tab:'tasksAdmin',urgent:false});
+  // 6. New feedback
+  const fbCount=(S.feedback||[]).filter(f=>!f.read).length;
+  if(fbCount>0)alerts.push({ic:'💬',txt:`${fbCount} feedback baru`,tab:'fbAdmin',urgent:false});
+
+  const list=document.getElementById('admAlertList');
+  document.getElementById('admAlertCount').textContent=alerts.length;
+  document.getElementById('admAlertCount').classList.toggle('zero',alerts.length===0);
+  if(alerts.length===0){
+    list.innerHTML='<div class="alerts-empty"><span class="e">✨</span>All caught up</div>';
+  }else{
+    list.innerHTML=alerts.map(a=>`<div class="alert-row${a.urgent?' urgent':''}" onclick="openAdminTool('${a.tab}')"><div class="ico">${a.ic}</div><div class="txt">${a.txt}</div><span class="arr">›</span></div>`).join('');
+  }
+
+  // Tile badges
+  const setBadge=(id,n)=>{const e=document.getElementById(id);if(e)e.textContent=n>0?String(n):'';};
+  setBadge('admBadgeSwaps',swapCount);
+  setBadge('admBadgeInv',0); // could compute low-stock count
+  setBadge('admBadgeTasks',taskCount);
+  setBadge('admBadgeFb',fbCount);
+  setBadge('admBadgePay',unpaidCount);
+
+  // Notif dot on header bell
+  const totalNotifs=swapCount+fbCount;
+  const nb=document.getElementById('admHomeNotifBadge');
+  if(nb)nb.textContent=totalNotifs>0?String(totalNotifs):'';
 }
 
 init();
