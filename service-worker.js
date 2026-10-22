@@ -1,105 +1,72 @@
-// Crew App Service Worker
-// Handles push notifications and routing when notifications are tapped
+// Koridor Crew v2 service worker: push notifications + offline app shell.
+const CACHE = 'crew-v2-1';
+const SHELL = [
+  './', 'index.html', 'app.css', 'manifest.json', 'icon-192.png',
+  'js/app.js', 'js/api.js', 'js/store.js', 'js/ui.js', 'js/push.js', 'js/config.js',
+  'js/views/home.js', 'js/views/schedule.js', 'js/views/tasks.js', 'js/views/chat.js', 'js/views/me.js',
+  'js/views/sheets.js', 'js/views/admin-today.js', 'js/views/admin-pay.js', 'js/views/admin-more.js',
+];
 
-const CACHE_VERSION = 'crew-v1';
-const SCOPE_PATH = '/koridor-crew/';
-
-// ──────────────────────────────────────
-// LIFECYCLE
-// ──────────────────────────────────────
-self.addEventListener('install', (event) => {
-  // Activate immediately on first install
+self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).catch(() => {}));
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
-  // Take control of all open tabs immediately
-  event.waitUntil(self.clients.claim());
+self.addEventListener('activate', (e) => {
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
 
-// ──────────────────────────────────────
-// PUSH RECEIVED
-// ──────────────────────────────────────
-self.addEventListener('push', (event) => {
-  let payload = {};
-  try {
-    payload = event.data ? event.data.json() : {};
-  } catch (e) {
-    payload = { title: 'Crew App', body: event.data ? event.data.text() : 'New notification' };
-  }
+// Network first for our own files, so updates land immediately; cache when offline.
+self.addEventListener('fetch', (e) => {
+  const url = new URL(e.request.url);
+  if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
+  e.respondWith((async () => {
+    try {
+      const res = await fetch(e.request);
+      if (res.ok) { const c = await caches.open(CACHE); c.put(e.request, res.clone()); }
+      return res;
+    } catch {
+      return (await caches.match(e.request)) || (await caches.match('index.html')) || Response.error();
+    }
+  })());
+});
 
-  const title = payload.title || 'Crew App 🥞';
-  const options = {
-    body: payload.body || '',
-    icon: payload.icon || 'icon-192.png',
+const ROUTES = { chat: 'chat', tasks: 'tasks', swap: 'schedule', reminder: '', stock: '', announce: '', test: '' };
+
+self.addEventListener('push', (e) => {
+  let p = {};
+  try { p = e.data ? e.data.json() : {}; } catch { p = { title: 'Koridor Crew', body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(p.title || 'Koridor Crew', {
+    body: p.body || '',
+    icon: 'icon-192.png',
     badge: 'icon-192.png',
-    tag: payload.tag || 'crew-default', // same tag = replaces previous
-    renotify: payload.renotify !== false, // re-alert even if same tag
-    requireInteraction: payload.priority === 'urgent',
-    data: {
-      url: payload.url || SCOPE_PATH,
-      type: payload.type || 'general',
-      payload: payload.data || {},
-      ts: Date.now()
-    },
-    vibrate: payload.priority === 'urgent' ? [200, 100, 200, 100, 200] : [100, 50, 100],
-    actions: payload.actions || []
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
+    tag: p.tag || p.type || 'crew',
+    renotify: true,
+    requireInteraction: !!p.urgent,
+    vibrate: p.urgent ? [200, 100, 200, 100, 200] : [80, 40, 80],
+    data: { type: p.type || '' },
+  }));
 });
 
-// ──────────────────────────────────────
-// NOTIFICATION TAP
-// ──────────────────────────────────────
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-
-  const data = event.notification.data || {};
-  const targetUrl = data.url || SCOPE_PATH;
-
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // If a Crew App window is already open, focus it and route
-      for (const client of clientList) {
-        if (client.url.includes(SCOPE_PATH) && 'focus' in client) {
-          client.postMessage({
-            type: 'NOTIFICATION_TAP',
-            target: data.type,
-            payload: data.payload
-          });
-          return client.focus();
-        }
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const route = ROUTES[e.notification.data?.type] ?? '';
+  const target = new URL(`./#/${route}`, self.registration.scope).href;
+  e.waitUntil((async () => {
+    const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const w of wins) {
+      if (w.url.startsWith(self.registration.scope)) {
+        w.postMessage({ type: 'open', route });
+        return w.focus();
       }
-      // Otherwise open a new window
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(targetUrl);
-      }
-    })
-  );
+    }
+    return self.clients.openWindow(target);
+  })());
 });
 
-// ──────────────────────────────────────
-// SUBSCRIPTION CHANGE (token rotation)
-// ──────────────────────────────────────
-self.addEventListener('pushsubscriptionchange', (event) => {
-  // The push subscription has expired or been invalidated.
-  // Re-subscribe and notify the page so it can update Supabase.
-  event.waitUntil(
-    self.registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: event.oldSubscription ? event.oldSubscription.options.applicationServerKey : null
-    }).then((newSub) => {
-      return self.clients.matchAll({ includeUncontrolled: true }).then((clients) => {
-        clients.forEach((client) => {
-          client.postMessage({
-            type: 'SUBSCRIPTION_RENEWED',
-            subscription: newSub.toJSON()
-          });
-        });
-      });
-    }).catch((err) => console.error('[SW] Re-subscribe failed:', err))
-  );
-});
+// If the browser rotates the push subscription, the app re-registers it on next open.
+self.addEventListener('pushsubscriptionchange', () => {});
